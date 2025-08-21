@@ -1,0 +1,11 @@
+{
+  "name": "@rene25/pact",
+  "version": "1.0.0",
+  "description": "a mini version of react",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "rene",
+  "license": "ISC"
+}
