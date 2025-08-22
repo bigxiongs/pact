@@ -1,0 +1,14 @@
+{
+  "name": "@rene25/pact-test",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "node index.js"
+  },
+  "dependencies": {
+    "@rene25/pact": "^1.0.0"
+  },
+  "author": "rene",
+  "license": "ISC"
+}

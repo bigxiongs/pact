@@ -10,6 +10,8 @@ export {
   createContext,
   useContext,
   memo,
-} from "./src/pact/pact.js"
+} from "./pact.js"
 
-export { Fragment } from './src/pact/components.js'
+export { Fragment } from './components.js'
+
+export const a = 1;

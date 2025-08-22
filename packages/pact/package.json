@@ -1,0 +1,15 @@
+{
+  "name": "@rene25/pact-src",
+  "version": "1.0.0",
+  "description": "pact implmentation",
+  "main": "index.js",
+  "scripts": {
+    "build": "webpack build"
+  },
+  "author": "rene",
+  "license": "ISC",
+  "dependencies": {
+    "webpack": "^5.101.3",
+    "webpack-cli": "^6.0.1"
+  }
+}

@@ -6,7 +6,7 @@ import {
   NormalPriority,
   LowPriority,
   IdlePriority,
-} from '../scheduler/index.js';
+} from './scheduler/index.js';
 
 function createElement(type, props, ...children) {
   return {
