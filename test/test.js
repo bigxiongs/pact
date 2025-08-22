@@ -1,3 +1,3 @@
-const Pact = require('../dist/index.js');
+import Pact from '../dist/index.js';
+
 console.log(Pact);
-// console.log(Pact.default);

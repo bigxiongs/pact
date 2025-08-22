@@ -1,9 +1,9 @@
-const path = require('path');
+import path from 'path';
 
-module.exports = {
+export default {
   entry: './index.js',
   output: {
-    path: path.resolve(__dirname, 'dist'),
+    path: path.resolve('./dist'),
     filename: "index.js",
     library: {
       name: 'Pact',
@@ -18,5 +18,4 @@ module.exports = {
     port: "3000",
   },
   mode: "production",
-  // devtool: "source-map",
 };

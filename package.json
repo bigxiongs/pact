@@ -3,10 +3,10 @@
   "version": "1.0.6",
   "description": "a mini verison of react",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "build": "webpack build",
-    "dev": "webpack serve",
-    "test": "node test/test.js"
+    "test": "webpack build && node test/test.js"
   },
   "author": "rene",
   "license": "ISC",

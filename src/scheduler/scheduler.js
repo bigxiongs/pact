@@ -1,4 +1,4 @@
-import { Heap } from './minHeap';
+import { Heap } from './minHeap.js';
 
 const queue = Heap([], (a, b) => (a.startTime !== b.startTime ? a.startTime - b.startTime : a.priority - b.priority));
 
