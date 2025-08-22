@@ -1,12 +1,4 @@
-import {
-  schedule,
-  shouldYield,
-  ImmediatePriority,
-  UserBlockingPriority,
-  NormalPriority,
-  LowPriority,
-  IdlePriority,
-} from './scheduler/index.js';
+import { schedule, shouldYield } from './scheduler/index.js';
 
 function createElement(type, props, ...children) {
   return {
@@ -313,7 +305,7 @@ function reconcileChildren(wipFiber, elements) {
   }
 }
 
-const update = (priority = NormalPriority) => {
+const update = () => {
   wipRoot = {
     dom: currentRoot.dom,
     props: currentRoot.props,
@@ -321,7 +313,8 @@ const update = (priority = NormalPriority) => {
   };
   nextUnitOfWork = wipRoot;
   effectList = [];
-  schedule(((task = { callback: workLoop, canceled: false }), { priority }));
+  task.canceled = false;
+  schedule((task = { callback: workLoop, canceled: false }));
 };
 
 function useState(initial) {
