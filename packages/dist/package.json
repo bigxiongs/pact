@@ -1,8 +1,11 @@
 {
   "name": "@rene25/pact",
-  "version": "1.0.0",
+  "version": "1.0.5",
   "description": "a mini version of react",
   "main": "index.js",
   "author": "rene",
-  "license": "ISC"
+  "license": "ISC",
+  "publishConfig": {
+    "access": "public"
+  }
 }
