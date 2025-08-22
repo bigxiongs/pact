@@ -4,7 +4,7 @@
   "description": "a mini version of react",
   "main": "index.js",
   "author": "rene",
-  "license": "ISC",
+  "license": "MIT",
   "publishConfig": {
     "access": "public"
   }
