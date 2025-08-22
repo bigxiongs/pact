@@ -1,6 +1,6 @@
 {
   "name": "@rene25/pact",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "a minimal React-like library",
   "main": "index.js",
   "author": "rene",

@@ -16,11 +16,6 @@ It is designed for learning, experimentation, and lightweight front-end projects
 ```bash
 npm install @rene25/pact
 ```
-Or include the built file directly in your HTML:
-
-```html
-<script src="dist/pact.js"></script>
-```
 
 ## Usage
 
