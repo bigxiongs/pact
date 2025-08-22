@@ -37,7 +37,7 @@ const flush = () => {
       queue.pop();
       continue;
     }
-    work.callback = work.callback();
+    work.callback = work?.callback?.();
     if (!work.callback) queue.pop();
     currentTime = now();
   }

@@ -1,6 +1,6 @@
-import path from 'path';
+const path = require('path');
 
-export default {
+exports.default = {
   entry: './index.js',
   output: {
     path: path.resolve('../dist'),
