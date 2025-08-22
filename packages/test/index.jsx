@@ -1,4 +1,4 @@
-import Pact from "../pact/index.js";
+import Pact from "@rene25/pact";
 
 function Counter() {
     const [count, setCount] = Pact.useState(0);
