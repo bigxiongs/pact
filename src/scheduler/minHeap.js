@@ -18,42 +18,39 @@ export const Heap = (heap = [], cmp = (a, b) => a - b) => ({
   },
   size: () => heap.length,
   isEmpty: () => heap.length === 0,
-  clear: () => { heap.length = 0; }
+  clear: () => {
+    heap.length = 0;
+  },
 });
 
 function siftUp(heap, node, index, cmp) {
   while (index > 0) {
-    const parentIndex = (index - 1) >>> 1
-    const parent = heap[parentIndex]
+    const parentIndex = (index - 1) >>> 1;
+    const parent = heap[parentIndex];
     if (cmp(node, parent) < 0) {
-      heap[parentIndex] = node
-      heap[index] = parent
-      index = parentIndex
-    } else return
+      heap[parentIndex] = node;
+      heap[index] = parent;
+      index = parentIndex;
+    } else return;
   }
 }
 
 function siftDown(heap, node, index, cmp) {
-  const length = heap.length
-  const halfLength = length >>> 1
+  const length = heap.length;
+  const halfLength = length >>> 1;
   while (index < halfLength) {
-    const leftIndex = (index + 1) * 2 - 1
-    const left = heap[leftIndex]
-    const rightIndex = leftIndex + 1
-    const right = heap[rightIndex]
-    if (
-      rightIndex < length &&
-      cmp(right, left) < 0 &&
-      cmp(right, node) < 0
-    ) {
-      heap[index] = right
-      heap[rightIndex] = node
-      index = rightIndex
+    const leftIndex = (index + 1) * 2 - 1;
+    const left = heap[leftIndex];
+    const rightIndex = leftIndex + 1;
+    const right = heap[rightIndex];
+    if (rightIndex < length && cmp(right, left) < 0 && cmp(right, node) < 0) {
+      heap[index] = right;
+      heap[rightIndex] = node;
+      index = rightIndex;
     } else if (leftIndex < length && cmp(left, node) < 0) {
-      heap[index] = left
-      heap[leftIndex] = node
-      index = leftIndex
-    } else return
+      heap[index] = left;
+      heap[leftIndex] = node;
+      index = leftIndex;
+    } else return;
   }
 }
-
