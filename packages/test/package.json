@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "webpack serve"
+    "start:index": "webpack serve",
+    "start:dev1": "webpack serve --env entry=dev1"
   },
   "dependencies": {
     "@babel/cli": "^7.24.1",
