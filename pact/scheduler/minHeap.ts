@@ -1,5 +1,7 @@
-export const Heap = (heap = [], cmp = (a, b) => a - b) => ({
-  push: (node) => {
+type Tcmp<T> = (a: T, b: T) => number;
+
+export const Heap = <T>(heap: T[] = [], cmp: Tcmp<T>) => ({
+  push: (node: T) => {
     const index = heap.length;
     heap.push(node);
     siftUp(heap, node, index, cmp);
@@ -23,7 +25,7 @@ export const Heap = (heap = [], cmp = (a, b) => a - b) => ({
   },
 });
 
-function siftUp(heap, node, index, cmp) {
+const siftUp = <T>(heap: T[], node: T, index: number, cmp: Tcmp<T>) => {
   while (index > 0) {
     const parentIndex = (index - 1) >>> 1;
     const parent = heap[parentIndex];
@@ -35,7 +37,7 @@ function siftUp(heap, node, index, cmp) {
   }
 }
 
-function siftDown(heap, node, index, cmp) {
+const siftDown = <T>(heap: T[], node: T, index: number, cmp: Tcmp<T>) => {
   const length = heap.length;
   const halfLength = length >>> 1;
   while (index < halfLength) {

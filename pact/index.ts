@@ -10,9 +10,9 @@ import {
   createContext,
   useContext,
   memo,
-} from "./pact.js"
+} from "./pact"
 
-import { Fragment } from './components.js'
+import { Fragment } from './components'
 
 export default {
   createElement,
@@ -41,6 +41,6 @@ export {
   createContext,
   useContext,
   memo,
-} from "./pact.js"
+} from "./pact"
 
-export { Fragment } from './components.js'
+export { Fragment } from './components'

@@ -2,7 +2,6 @@
   "name": "@rene25/pact-src",
   "version": "1.0.0",
   "description": "pact implmentation",
-  "main": "index.js",
   "scripts": {
     "build": "webpack build"
   },
@@ -11,5 +10,10 @@
   "dependencies": {
     "webpack": "^5.101.3",
     "webpack-cli": "^6.0.1"
+  },
+  "devDependencies": {
+    "source-map-loader": "^5.0.0",
+    "ts-loader": "^9.5.4",
+    "typescript": "^5.9.2"
   }
 }

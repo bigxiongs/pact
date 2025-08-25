@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "outDir": "../packages/dist/",
+    "sourceMap": true,
+    "noImplicitAny": true,
+    "module": "commonjs",
+    "target": "es5",
+    // "allowJs": true,        // Allow importing .js files
+    // "checkJs": true,        // Type-check JavaScript files
+    // "moduleResolution": "node"
+  },
+  "include": ["./**/*", "./*"]
+}

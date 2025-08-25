@@ -1,6 +1,20 @@
-import { schedule, shouldYield } from './scheduler/index.js';
+import { schedule, shouldYield } from './scheduler';
+import { TTask } from './scheduler/scheduler';
 
-function createElement(type, props, ...children) {
+type TElement = {
+  type: string | TFunctionComponent;
+  props: TProps | {
+    children: TElement[];
+    key?: any;
+  }
+  compare?: (prop1: TProps, prop2: TProps) => boolean;
+}
+
+type TProps = Record<string, any>
+
+type TFunctionComponent = (props: TProps) => TElement;
+
+function createElement(type: string, props: TProps, ...children: TElement[]): TElement {
   return {
     type,
     props: {
@@ -10,25 +24,42 @@ function createElement(type, props, ...children) {
   };
 }
 
-function createTextElement(text) {
+function createTextElement(text: string) {
   return createElement('TEXT_ELEMENT', { nodeValue: text });
 }
 
-function createDom(fiber) {
-  const dom = fiber.type == 'TEXT_ELEMENT' ? document.createTextNode('') : document.createElement(fiber.type);
+type TFiber = {
+  type: string | Function;
+  props: TProps;
+  dom: HTMLElement | Text;
+  parent: TFiber;
+  alternate: TFiber;
+  effectTag?: string;
+  context?: any;
+  memoized?: boolean;
+  child?: TFiber;
+  sibling?: TFiber;
+}
+
+type TFunctionFiber = Omit<TFiber, "type"> & {
+  type: Function;
+};
+
+function createDom(fiber: TFiber) {
+  const dom = fiber.type == 'TEXT_ELEMENT' ? document.createTextNode('') : document.createElement(fiber.type as string);
 
   updateDom(dom, {}, fiber.props);
 
   return dom;
 }
 
-const isEvent = (key) => key.startsWith('on');
-const isProperty = (key) => key !== 'children' && !isEvent(key);
-const isNew = (prev, next) => (key) => prev[key] !== next[key];
-const isGone = (prev, next) => (key) => !(key in next);
-const isRef = (key) => key == 'ref';
+const isEvent = (key: string) => key.startsWith('on');
+const isProperty = (key: string) => key !== 'children' && !isEvent(key);
+const isNew = (prev: Record<string, string>, next: Record<string, string>) => (key: string) => prev[key] !== next[key];
+const isGone = (prev: Record<string, string>, next: Record<string, string>) => (key: string) => !(key in next);
+const isRef = (key: string) => key == 'ref';
 
-const toCssText = (style) => {
+const toCssText = (style: Record<string, string>) => {
   style = JSON.parse(JSON.stringify(style));
 
   Object.keys(style).forEach((key) => {
@@ -44,9 +75,16 @@ const toCssText = (style) => {
     .join('');
 };
 
+type WritableKeys<T> = { [P in keyof T]: IfEquals<{ [Q in P]: T[P] }, { -readonly [Q in P]: T[P] }, P> }[keyof T];
+
+// 辅助类型，判断两个类型是否相同
+type IfEquals<T, U, Y=unknown, N=never> =
+    (<G>() => G extends T ? 1 : 2) extends
+    (<G>() => G extends U ? 1 : 2) ? Y : N;
+
 // usecase 1: when create a new dom as the second tree, we need the fiber to sync it's props
 // usecase 2: when we conclues the effect list, we perform those effect through updates
-function updateDom(dom, prevProps, nextProps) {
+function updateDom(dom: HTMLElement | Text, prevProps: TProps, nextProps: TProps) {
   //Remove old or changed event listeners
   Object.keys(prevProps)
     .filter(isEvent)
@@ -61,7 +99,7 @@ function updateDom(dom, prevProps, nextProps) {
     .filter(isProperty)
     .filter(isGone(prevProps, nextProps))
     .forEach((name) => {
-      dom[name] = '';
+      dom[name as WritableKeys<HTMLElement | Text>] = '' as never;
     });
 
   // Set new or changed properties
@@ -70,9 +108,9 @@ function updateDom(dom, prevProps, nextProps) {
     .filter(isNew(prevProps, nextProps))
     .forEach((name) => {
       if (name === 'style') {
-        dom.style.cssText = toCssText(nextProps[name]);
+        (dom as any).style.cssText = toCssText(nextProps[name]);
       } else {
-        dom[name] = nextProps[name];
+        dom[name as WritableKeys<HTMLElement | Text>] = nextProps[name] as never;
       }
     });
 
@@ -93,8 +131,8 @@ function updateDom(dom, prevProps, nextProps) {
     });
 }
 
-let pendingEffects = [];
-let effectCleanups = [];
+let pendingEffects: Function[] = [];
+let effectCleanups: Function[] = [];
 function commitRoot() {
   effectList.forEach(commitWork);
   commitWork(wipRoot.child);
@@ -107,7 +145,7 @@ function commitRoot() {
 }
 
 // unit work of commitRoot
-function commitWork(fiber) {
+function commitWork(fiber: TFiber) {
   if (!fiber) return;
 
   let domParentFiber = fiber.parent;
@@ -128,7 +166,7 @@ function commitWork(fiber) {
   commitWork(fiber.sibling);
 }
 
-function commitDeletion(fiber, domParent) {
+function commitDeletion(fiber: TFiber, domParent: HTMLElement | Text) {
   if (fiber.dom) {
     domParent.removeChild(fiber.dom);
   } else {
@@ -136,7 +174,7 @@ function commitDeletion(fiber, domParent) {
   }
 }
 
-function render(element, container) {
+function render(element: TElement, container: HTMLElement) {
   wipRoot = {
     dom: container,
     props: {
@@ -151,15 +189,15 @@ function render(element, container) {
 }
 
 // nextUnitOfWork are initiated to a newly created wipRoot
-let nextUnitOfWork = null;
+let nextUnitOfWork: any = null;
 // constructed and rendered root of the element tree
-let currentRoot = null;
+let currentRoot: any = null;
 // work in progress root of the element tree
-let wipRoot = null;
+let wipRoot: any = null;
 // list of effect for commit phase
-let effectList = null;
+let effectList: any = null;
 
-let task = { callback: null, canceled: true };
+let task: Omit<TTask, "startTime"> = { callback: null, canceled: true };
 
 // work loop with scheduler
 function workLoop() {
@@ -171,11 +209,11 @@ function workLoop() {
   return null;
 }
 
-const isFunctionComponent = (fiber) => fiber.type instanceof Function;
-const isContextProvider = (fiber) => 'context' in fiber;
-const isMemoizedFiber = (fiber) => 'memoized' in fiber;
+const isFunctionComponent = (fiber: TFiber): fiber is TFunctionFiber=> fiber.type instanceof Function;
+const isContextProvider = (fiber: TFiber) => 'context' in fiber;
+const isMemoizedFiber = (fiber: TFiber) => 'memoized' in fiber;
 // wipRoot as fiber
-function performUnitOfWork(fiber) {
+function performUnitOfWork(fiber: TFiber) {
   if (!isMemoizedFiber(fiber)) {
     if (isFunctionComponent(fiber)) {
       updateFunctionComponent(fiber);
@@ -195,10 +233,10 @@ function performUnitOfWork(fiber) {
   }
 }
 
-let wipFiber = null;
-let hookIndex = null;
+let wipFiber: any = null;
+let hookIndex: any = null;
 
-function updateFunctionComponent(fiber) {
+function updateFunctionComponent(fiber: TFunctionFiber) {
   wipFiber = fiber;
   hookIndex = 0;
   wipFiber.hooks = [];
@@ -206,22 +244,22 @@ function updateFunctionComponent(fiber) {
   reconcileChildren(fiber, children);
 }
 
-function updateHostComponent(fiber) {
+function updateHostComponent(fiber: TFiber) {
   if (!fiber.dom) fiber.dom = createDom(fiber);
 
   reconcileChildren(fiber, fiber.props.children.flat());
 }
 
-const isMemoElement = (element) => 'compare' in element;
+const isMemoElement = (element: TElement) => 'compare' in element;
 // creating fiber tree and add effects
-function reconcileChildren(wipFiber, elements) {
+function reconcileChildren(wipFiber: TFiber, elements: TElement[]) {
   let index = 0;
   let oldFiber = wipFiber.alternate && wipFiber.alternate.child;
   let prevSibling = null;
 
   while (index < elements.length || oldFiber != null) {
     const element = elements[index];
-    let newFiber = null;
+    let newFiber: TFiber = null;
 
     const sameType = oldFiber && element && element.type == oldFiber.type;
     const memoized = isMemoElement(element);
@@ -277,7 +315,7 @@ function reconcileChildren(wipFiber, elements) {
 
       for (let key in oldFiber.props) {
         if (shouldUpdate) break;
-        if (!key in newFiber.props) shouldUpdate = true;
+        if (!(key in newFiber.props)) shouldUpdate = true;
         else if (!element.compare(oldFiber.props[key], newFiber.props[key])) shouldUpdate = true;
       }
 
@@ -317,21 +355,21 @@ const update = () => {
   schedule((task = { callback: workLoop, canceled: false }));
 };
 
-function useState(initial) {
+function useState<T>(initial: T) {
   initial = typeof initial == 'function' ? initial() : initial;
   const oldHook = wipFiber?.alternate?.hooks[hookIndex];
 
-  const hook = {
+  const hook: {state: T; queue: Function[]} = {
     state: oldHook ? oldHook.state : initial,
     queue: [],
   };
 
   const actions = oldHook ? oldHook.queue : [];
-  actions.forEach((action) => {
+  actions.forEach((action: (state: T) => T) => {
     hook.state = action(hook.state);
   });
 
-  const setState = (action) => {
+  const setState = (action: string) => {
     const mutate = typeof action == 'function' ? action : () => action;
     hook.queue.push(mutate);
     update();
@@ -342,7 +380,7 @@ function useState(initial) {
   return [hook.state, setState];
 }
 
-function useEffect(callback, dependencies) {
+function useEffect(callback: Function, dependencies: any[]) {
   const oldHook = wipFiber?.alternate?.hooks[hookIndex];
 
   const hasChanged =
@@ -359,12 +397,12 @@ function useEffect(callback, dependencies) {
   hookIndex++;
 }
 
-function useReducer(reducer, initialState) {
+function useReducer<T>(reducer: (state: T, action: string) => T, initialState: T) {
   const oldHook = wipFiber?.alternate?.hooks[hookIndex];
 
   const hook = {
     state: oldHook ? oldHook.state : initialState,
-    dispatch: (action) => {
+    dispatch: (action: string) => {
       hook.state = reducer(hook.state, action);
       update();
     },
@@ -375,7 +413,7 @@ function useReducer(reducer, initialState) {
   return [hook.state, hook.dispatch];
 }
 
-function useMemo(factory, deps) {
+function useMemo<T>(factory: () => T, deps: any[]) {
   const oldHook = wipFiber?.alternate?.hooks[hookIndex];
 
   const hook = {
@@ -392,7 +430,7 @@ function useMemo(factory, deps) {
   return hook.value;
 }
 
-function useCallback(callback, deps) {
+function useCallback(callback: Function, deps: any[]) {
   const oldHook = wipFiber?.alternate?.hooks[hookIndex];
 
   const hook = {
@@ -411,7 +449,7 @@ function useCallback(callback, deps) {
   return hook.callback;
 }
 
-function useRef(initialValue) {
+function useRef<T>(initialValue: T) {
   const oldHook = wipFiber?.alternate?.hooks[hookIndex];
   if (oldHook) {
     wipFiber.hooks.push(oldHook);
@@ -425,14 +463,14 @@ function useRef(initialValue) {
 }
 
 let contextIndex = 0;
-function createContext(defaultValue) {
+function createContext<T>(defaultValue: T) {
   const contextId = '__Ctx' + contextIndex++;
 
-  function Consumer(props, contextValue) {
+  function Consumer(props: TProps, contextValue: T) {
     return props.children(contextValue);
   }
 
-  function Provider(props) {
+  function Provider(props: TProps) {
     const context = {
       [contextId]: { _id: contextId, _defaultValue: props.value },
     };
@@ -453,24 +491,24 @@ function createContext(defaultValue) {
   return context;
 }
 
-function useContext(context) {
+function useContext(context: ReturnType<typeof createContext>) {
   if (isContextProvider(wipFiber) && context._id in wipFiber.context)
     return wipFiber.context[context._id]._defaultValue;
 
   return context._defaultValue;
 }
 
-const defaultCompare = (prop1, prop2) => prop1 === prop2;
+const defaultCompare = (prop1: TProps, prop2: TProps) => prop1 === prop2;
 
-function memo(component, compare = defaultCompare) {
-  function Memoized(props) {
+function memo(component: TFunctionComponent, compare = defaultCompare): TFunctionComponent {
+  function Memoized(props: TProps): TElement {
     return {
       type: component,
       props,
       compare,
     };
   }
-  return Memoized;
+  return Memoized as TFunctionComponent;
 }
 
 export {
@@ -486,3 +524,16 @@ export {
   useContext,
   memo,
 };
+
+type t1 = {
+  a: string | number;
+  readonly b: number;
+}
+
+const t: t1 = {
+  a: 1,
+  b: 2
+}
+
+let key = 'a';
+t[key as WritableKeys<t1>] = 3;

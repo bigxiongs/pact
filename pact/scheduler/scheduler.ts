@@ -1,27 +1,36 @@
-import { Heap } from './minHeap.js';
+import { Heap } from './minHeap';
 
 const queue = Heap([], (a, b) => (a.startTime !== b.startTime ? a.startTime - b.startTime : a.priority - b.priority));
 
 const threshold = 5;
-const transitions = [];
+const transitions: any[] = [];
 let deadline = 0;
 let work;
 
 const now = () => performance.now();
 export const shouldYield = () => now() >= deadline;
 
-const task = (pending) => {
+const task = (pending: boolean) => {
   const cb = () => transitions.splice(0, 1).forEach((c) => c());
   return pending ? () => setTimeout(cb) : () => queueMicrotask(cb);
 };
 
 let translate = task(false);
 
-const startTransition = (cb) => {
+const startTransition = (cb: () => void) => {
   transitions.push(cb) && translate();
 };
 
-export const schedule = (task, option = {}) => {
+export type TTask = {
+  callback: () => Function;
+  canceled: boolean;
+  startTime: number;
+}
+type TOption = {
+  priority?: number;
+  delay?: number;
+}
+export const schedule = (task: Omit<TTask, 'startTime'>, option: TOption = {}) => {
   const { priority = NormalPriority, delay = 0 } = option;
   const startTime = now() + delay;
   queue.push({ priority, startTime, ...task });
