@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start:index": "webpack serve",
-    "start:dev1": "webpack serve --env entry=dev1"
+    "start:dev1": "npx webpack serve --env entry=dev1"
   },
   "dependencies": {
     "@babel/cli": "^7.24.1",
@@ -17,9 +17,12 @@
     "html-webpack-plugin": "^5.6.0",
     "style-loader": "^4.0.0",
     "webpack": "^5.91.0",
-    "webpack-cli": "^5.1.4",
     "webpack-dev-server": "^5.0.4"
   },
   "author": "rene",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "ts-loader": "^9.5.4",
+    "webpack-cli": "^6.0.1"
+  }
 }

@@ -524,16 +524,3 @@ export {
   useContext,
   memo,
 };
-
-type t1 = {
-  a: string | number;
-  readonly b: number;
-}
-
-const t: t1 = {
-  a: 1,
-  b: 2
-}
-
-let key = 'a';
-t[key as WritableKeys<t1>] = 3;
