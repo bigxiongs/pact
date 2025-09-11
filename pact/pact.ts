@@ -342,8 +342,17 @@ function reconcileChildren(wipFiber: TFiber, elements: TElement[]) {
     index++;
   }
 }
-
-const update = () => {
+const debounce = (cb: () => void, delay: number) => {
+  let timer: any = null;
+  return () => {
+    if (timer) clearTimeout(timer);
+    timer = setTimeout(() => {
+      cb();
+      timer = null;
+    }, delay);
+  };
+}
+const update = debounce(() => {
   wipRoot = {
     dom: currentRoot.dom,
     props: currentRoot.props,
@@ -353,7 +362,7 @@ const update = () => {
   effectList = [];
   task.canceled = false;
   schedule((task = { callback: workLoop, canceled: false }));
-};
+}, 5);
 
 function useState<T>(initial: T) {
   initial = typeof initial == 'function' ? initial() : initial;
