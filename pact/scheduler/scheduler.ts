@@ -12,7 +12,7 @@ export const shouldYield = () => now() >= deadline;
 
 const task = (pending: boolean) => {
   const cb = () => transitions.splice(0, 1).forEach((c) => c());
-  return pending ? () => setTimeout(cb) : () => queueMicrotask(cb);
+  return pending ? () => requestAnimationFrame(() => requestAnimationFrame(cb)) : () => queueMicrotask(cb);
 };
 
 let translate = task(false);
@@ -26,10 +26,12 @@ export type TTask = {
   canceled: boolean;
   startTime: number;
 }
+
 type TOption = {
   priority?: number;
   delay?: number;
 }
+
 export const schedule = (task: Omit<TTask, 'startTime'>, option: TOption = {}) => {
   const { priority = NormalPriority, delay = 0 } = option;
   const startTime = now() + delay;
